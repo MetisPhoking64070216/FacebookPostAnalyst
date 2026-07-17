@@ -3,6 +3,7 @@ import time
 import pandas as pd
 import io
 import re
+import os
 from datetime import datetime
 from transformers import pipeline
 
@@ -212,8 +213,18 @@ if submit_btn:
             options.add_argument("--disable-notifications")
             options.add_argument("--window-size=1920,1080")
             
+            # # ให้ webdriver_manager จัดการโหลด Driver บน Server ให้อัตโนมัติโดยไม่ต้องอ้างอิงไดรฟ์ C:
+            # service = Service(ChromeDriverManager().install())
+            # driver = webdriver.Chrome(service=service, options=options)
+
             # ให้ webdriver_manager จัดการโหลด Driver บน Server ให้อัตโนมัติโดยไม่ต้องอ้างอิงไดรฟ์ C:
-            service = Service(ChromeDriverManager().install())
+            if os.path.exists("/usr/bin/chromedriver"):
+                options.binary_location = "/usr/bin/chromium"
+                service = Service("/usr/bin/chromedriver")
+            else:
+                # ถ้ารันบนเครื่องตัวเอง (Windows/Mac) ค่อยให้ระบบโหลด Driver อัตโนมัติ
+                service = Service(ChromeDriverManager().install())
+                
             driver = webdriver.Chrome(service=service, options=options)
             
             # ⭐️ ใช้ st.status เพื่อรวม Log การทำงานไว้ในกล่องเดียว ไม่รกหน้าจอ
